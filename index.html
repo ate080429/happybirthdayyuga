@@ -518,19 +518,21 @@
       const inputVal = inputEl.value.trim();
 
       if (inputVal === SECRET_PASSWORD) {
-        errorEl.innerText = "";
-        nextScreen('screen-video');
-        
-        const vid = document.getElementById('intro-video');
-        if (vid) {
-          const playPromise = vid.play();
-          if (playPromise !== undefined) {
-            playPromise.catch(error => {
-              console.log("動画自動再生制限");
-            });
-          }
+      errorEl.innerText = "";
+      nextScreen('screen-video');
+
+      const vid = document.getElementById('intro-video');
+      if (vid) {
+        vid.muted = false; // 音声をオンにする
+        vid.currentTime = 0; // 最初から再生
+        const playPromise = vid.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(error => {
+            console.log("動画再生エラー:", error);
+          });
         }
-      } else {
+      }
+    } else {
         errorEl.innerText = "合言葉が違います！もう一度試してね";
       }
     }
