@@ -378,7 +378,7 @@
     <div class="option-grid">
       <button class="option-btn" onclick="selectOption('ans-area', '🍑 福島', this)">🍑 福島</button>
       <button class="option-btn" onclick="selectOption('ans-area', '🗼 東京', this)">🗼 東京</button>
-      <button class="option-btn" style="grid-column: span 2;" onclick="selectOption('ans-area', '✨ その他・どこでもOK', this)">✨ その他・どこでもOK</button>
+      <button class="option-btn" style="grid-column: span 2;" onclick="selectOption('ans-area', '✨ その他', this)">✨ その他</button>
     </div>
     <button onclick="nextScreen('screen-q3')" style="margin-top: 25px;">次へ ▶</button>
   </div>
@@ -409,11 +409,11 @@
       <button class="option-btn" onclick="selectOption('ans-place', '🎮 遊ぶ', this)">🎮 遊ぶ</button>
       <button class="option-btn" onclick="selectOption('ans-place', '🌳 お散歩', this)">🌳 お散歩</button>
       <button class="option-btn" onclick="selectOption('ans-place', '🚃 おでかけ', this)">🚃 おでかけ</button>
-      <button class="option-btn" onclick="selectOption('ans-place', '♨️ 温泉', this)">♨️ 温泉</button>
+      <button class="option-btn" onclick="selectOption('ans-place', '♨️ 温泉', this)">♨️ 温泉</button><button class="option-btn" onclick="selectOption('ans-place', '⛰️ 山', this)">⛰️ 山</button>
     </div>
     <div style="margin-top: 15px; width: 100%; max-width: 320px;">
       <p style="font-size: 0.85rem; color: #666; margin: 5px 0 0 0;">✍️ その他（行きたい場所を入力）:</p>
-      <input type="text" id="custom-place" class="text-input" placeholder="例：水族館、テーマパークなど" oninput="handleCustomInput('ans-place', this.value)">
+      <input type="text" id="custom-place" class="text-input" placeholder="例：海、テーマパークなど" oninput="handleCustomInput('ans-place', this.value)">
     </div>
     <button onclick="nextScreen('screen-q5')" style="margin-top: 20px;">次へ ▶</button>
   </div>
