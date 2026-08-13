@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>🎉HAPPY BIRTHDAY🎉</title>
+  
+  <meta property="og:title" content="HAPPY BIRTHDAY">
+  <meta property="og:type" content="website">
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: linear-gradient(135deg, #fff0f5 0%, #ffe4e1 100%);
+      color: #333;
+      text-align: center;
+      overflow-x: hidden;
+    }
+
+    /* ✨ 画面全体でひらひら舞う紙吹雪の設定 */
+    .confetti-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .confetti {
+      position: absolute;
+      top: -10%;
+      font-size: 1.5rem;
+      animation: fall 5s linear infinite;
+      opacity: 0.8;
+    }
+
+    @keyframes fall {
+      0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 0.9;
+      }
+      100% {
+        transform: translateY(115vh) rotate(360deg);
+        opacity: 0.1;
+      }
+    }
+
+    .screen {
+      display: none;
+      min-height: 100vh;
+      padding: 20px;
+      box-sizing: border-box;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .active {
+      display: flex;
+    }
+
+    /* 🔑 ロック画面 */
+    .pass-box {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 25px;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(255, 105, 180, 0.25);
+      max-width: 280px;
+      width: 90%;
+      border: 2px solid #ffb6c1;
+    }
+
+    .pass-input, .text-input {
+      width: 85%;
+      padding: 12px;
+      font-size: 1rem;
+      border: 2px solid #ffb6c1;
+      border-radius: 10px;
+      text-align: center;
+      outline: none;
+      margin-top: 10px;
+      box-sizing: border-box;
+    }
+
+    .pass-input:focus, .text-input:focus {
+      border-color: #ff69b4;
+    }
+
+    /* 🎬 全画面動画画面 */
+    #screen-video {
+      padding: 0;
+      background-color: #000;
+      cursor: pointer;
+      overflow: hidden;
+    }
+
+    .video-wrapper {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .video-wrapper video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    h1, h2, h3 {
+      margin-bottom: 12px;
+    }
+
+    p {
+      line-height: 1.6;
+    }
+
+    button {
+      background: linear-gradient(45deg, #ff69b4, #ff1493);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 25px;
+      cursor: pointer;
+      margin: 10px;
+      box-shadow: 0 4px 10px rgba(255, 20, 147, 0.3);
+      transition: transform 0.1s;
+    }
+
+    button:active {
+      transform: scale(0.95);
+    }
+
+    /* 📅 カレンダー */
+    .calendar-container {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 16px;
+      padding: 15px;
+      box-shadow: 0 4px 15px rgba(255, 105, 180, 0.15);
+      width: 100%;
+      max-width: 320px;
+      margin: 10px 0;
+    }
+
+    .calendar-header {
+      font-weight: bold;
+      font-size: 1.1rem;
+      color: #ff69b4;
+      margin-bottom: 8px;
+      border-bottom: 1px dashed #ffb6c1;
+      padding-bottom: 5px;
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 5px;
+    }
+
+    .day-name {
+      font-size: 0.8rem;
+      font-weight: bold;
+      color: #888;
+      padding-bottom: 5px;
+    }
+
+    .day-name.sun { color: #ff6b6b; }
+    .day-name.sat { color: #4d96ff; }
+
+    .day-cell {
+      aspect-ratio: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      border-radius: 10px;
+      background-color: #fafafa;
+      font-size: 0.85rem;
+      border: 1px solid #eee;
+    }
+
+    .day-cell.available {
+      background-color: #fff0f5;
+      border: 1.5px solid #ffb6c1;
+      cursor: pointer;
+    }
+
+    .day-cell.available .status {
+      color: #ff1493;
+      font-weight: bold;
+      font-size: 0.9rem;
+    }
+
+    .day-cell.unavailable .status {
+      color: #ccc;
+      font-size: 0.8rem;
+    }
+
+    .day-cell.selected {
+      background-color: #ff69b4 !important;
+      color: white !important;
+      border-color: #ff69b4 !important;
+    }
+
+    .day-cell.selected .status {
+      color: white !important;
+    }
+
+    .option-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      width: 100%;
+      max-width: 320px;
+      margin-top: 15px;
+    }
+
+    .option-btn {
+      background-color: white;
+      color: #333;
+      border: 2px solid #ffb6c1;
+      border-radius: 12px;
+      padding: 12px;
+      font-size: 0.95rem;
+      margin: 0;
+      box-shadow: none;
+    }
+
+    .option-btn.selected {
+      background-color: #ff69b4;
+      color: white;
+      border-color: #ff69b4;
+    }
+
+    select {
+      width: 80%;
+      max-width: 280px;
+      padding: 12px;
+      margin-top: 15px;
+      font-size: 1rem;
+      border: 2px solid #ffb6c1;
+      border-radius: 10px;
+      outline: none;
+    }
+
+    #no-btn {
+      position: relative;
+      transition: all 0.2s ease;
+      background: #aaa;
+      box-shadow: none;
+    }
+
+    #screen-error {
+      background-color: #1a1a1a;
+      color: #ff4d4d;
+    }
+
+    .error-box {
+      border: 2px solid #ff4d4d;
+      padding: 15px;
+      border-radius: 10px;
+      background: #2b2b2b;
+      margin: 15px 0;
+    }
+
+    .scroll-calendar-area {
+      max-height: 48vh;
+      overflow-y: auto;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ✨ ひらひら舞い降りる紙吹雪・アイコンエリア -->
+  <div class="confetti-container">
+    <div class="confetti" style="left: 6%; animation-delay: 0s;">🎉</div>
+    <div class="confetti" style="left: 18%; animation-delay: 1.5s; font-size: 1.2rem;">💖</div>
+    <div class="confetti" style="left: 32%; animation-delay: 3s;">🎈</div>
+    <div class="confetti" style="left: 48%; animation-delay: 0.8s; font-size: 1.8rem;">✨</div>
+    <div class="confetti" style="left: 62%; animation-delay: 2.2s;">🎂</div>
+    <div class="confetti" style="left: 76%; animation-delay: 3.8s; font-size: 1.3rem;">🌸</div>
+    <div class="confetti" style="left: 88%; animation-delay: 0.4s;">🥳</div>
+  </div>
+
+  <!-- 🔒 ロック画面 -->
+  <div id="screen-lock" class="screen active">
+    <div class="pass-box">
+      <h2 style="color: #ff69b4; margin-top: 0;">🎂 Birthday Lock 🎁</h2>
+      <p style="font-size: 0.9rem; color: #666; margin-bottom: 10px;">パスワードを入力してね</p>
+      
+      <input type="text" id="pass-input" class="pass-input" placeholder="パスワード" inputmode="numeric" enterkeyhint="done" onkeydown="handleKeyPress(event)">
+      <br><br>
+      <button onclick="checkPassword()" style="margin: 0;">開ける 🔑</button>
+      <p id="pass-error" style="color: #ff4d4d; font-weight: bold; font-size: 0.85rem; margin: 10px 0 0 0; min-height: 20px;"></p>
+    </div>
+  </div>
+
+  <!-- 🎬 画面0: 動画全画面表示 -->
+  <div id="screen-video" class="screen" onclick="endVideoAndNext()" ontouchstart="endVideoAndNext()">
+    <div class="video-wrapper">
+      <video id="intro-video" src="video.mp4" loop muted playsinline></video>
+    </div>
+  </div>
+
+  <!-- 💌 画面1: START -->
+  <div id="screen-start" class="screen">
+    <h1 style="color: #ff1493; text-shadow: 0 2px 5px rgba(255,105,180,0.3);">🎉 HAPPY BIRTHDAY 🎉</h1>
+    <p>お誕生日おめでとう！🎂次のおでかけプラン考えませんか！！<br>下の質問に答えてね！</p>
+    <h3>私とデートしませんか？</h3>
+    <div style="position: relative; width: 100%; height: 120px; display: flex; justify-content: center; align-items: center;">
+      <button onclick="nextScreen('screen-q1')">💗 YES</button>
+      <button id="no-btn" onclick="escapeNo()">💔 NO</button>
+    </div>
+    <p id="no-msg" style="color: #ff1493; font-weight: bold; min-height: 24px;"></p>
+  </div>
+
+  <!-- 📅 画面2: QUESTION 01 (カレンダー) -->
+  <div id="screen-q1" class="screen">
+    <p style="color: #ff1493; font-weight: bold; margin-bottom: 5px;">🎉 やったー🎉<br>希望する日をタップで選んでね（複数OK！）</p>
+    <h2>📅 QUESTION 01</h2>
+
+    <div class="scroll-calendar-area">
+      <!-- 9月カレンダー -->
+      <div class="calendar-container">
+        <div class="calendar-header">9月</div>
+        <div class="calendar-grid">
+          <div class="day-name sun">日</div>
+          <div class="day-name">月</div>
+          <div class="day-name">火</div>
+          <div class="day-name">水</div>
+          <div class="day-name">木</div>
+          <div class="day-name">金</div>
+          <div class="day-name sat">土</div>
+          <div id="calendar-days-sep" style="display: contents;"></div>
+        </div>
+      </div>
+
+      <!-- 10月カレンダー -->
+      <div class="calendar-container">
+        <div class="calendar-header">10月</div>
+        <div class="calendar-grid">
+          <div class="day-name sun">日</div>
+          <div class="day-name">月</div>
+          <div class="day-name">火</div>
+          <div class="day-name">水</div>
+          <div class="day-name">木</div>
+          <div class="day-name">金</div>
+          <div class="day-name sat">土</div>
+          <div id="calendar-days-oct" style="display: contents;"></div>
+        </div>
+      </div>
+    </div>
+
+    <p id="selected-date-display" style="color: #ff1493; font-weight: bold; min-height: 24px; margin: 10px 0; font-size: 0.9rem; max-width: 300px;"></p>
+    <button onclick="confirmDateAndNext()">次へ ▶</button>
+  </div>
+
+  <!-- 🏯 画面3: QUESTION 02 (エリア選択) -->
+  <div id="screen-q2" class="screen">
+    <h2>🏯 QUESTION 02</h2>
+    <h3>どのあたりで会いたい？</h3>
+    <div class="option-grid">
+      <button class="option-btn" onclick="selectOption('ans-area', '🍑 福島', this)">🍑 福島</button>
+      <button class="option-btn" onclick="selectOption('ans-area', '🗼 東京', this)">🗼 東京</button>
+      <button class="option-btn" style="grid-column: span 2;" onclick="selectOption('ans-area', '✨ その他・どこでもOK', this)">✨ その他・どこでもOK</button>
+    </div>
+    <button onclick="nextScreen('screen-q3')" style="margin-top: 25px;">次へ ▶</button>
+  </div>
+
+  <!-- 🕐 画面4: QUESTION 03 -->
+  <div id="screen-q3" class="screen">
+    <h2>🕐 QUESTION 03</h2>
+    <h3>何時くらいから会いたい？</h3>
+    <p>朝・昼・夕方・夜など</p>
+    <select id="ans-time">
+      <option value="朝から☀️">朝から☀️</option>
+      <option value="お昼ごろからランチ🍴">お昼ごろからランチ🍴</option>
+      <option value="夕方からカフェ☕">夕方からカフェ☕</option>
+      <option value="夜からごはんディナー🌙">夜からごはんディナー🌙</option>
+    </select>
+    <button onclick="saveAndNext('ans-time', 'screen-q4')">次へ ▶</button>
+  </div>
+
+  <!-- 📍 画面5: QUESTION 04 (自由書き込み対応) -->
+  <div id="screen-q4" class="screen">
+    <h2>📍 QUESTION 04</h2>
+    <h3>どこに行きたい？</h3>
+    <div class="option-grid">
+      <button class="option-btn" style="grid-column: span 2; background-color: #fff5f8; font-weight: bold; border-color: #ff69b4;" onclick="selectOption('ans-place', '🤝 一緒に考えたい！', this)">🤝 一緒に考えたい！</button>
+      <button class="option-btn" onclick="selectOption('ans-place', '🍴 ご飯', this)">🍴 ご飯</button>
+      <button class="option-btn" onclick="selectOption('ans-place', '☕ カフェ', this)">☕ カフェ</button>
+      <button class="option-btn" onclick="selectOption('ans-place', '🎬 映画', this)">🎬 映画</button>
+      <button class="option-btn" onclick="selectOption('ans-place', '🎮 遊ぶ', this)">🎮 遊ぶ</button>
+      <button class="option-btn" onclick="selectOption('ans-place', '🌳 お散歩', this)">🌳 お散歩</button>
+      <button class="option-btn" onclick="selectOption('ans-place', '🚃 おでかけ', this)">🚃 おでかけ</button>
+      <button class="option-btn" onclick="selectOption('ans-place', '♨️ 温泉', this)">♨️ 温泉</button>
+    </div>
+    <div style="margin-top: 15px; width: 100%; max-width: 320px;">
+      <p style="font-size: 0.85rem; color: #666; margin: 5px 0 0 0;">✍️ その他（行きたい場所を入力）:</p>
+      <input type="text" id="custom-place" class="text-input" placeholder="例：水族館、テーマパークなど" oninput="handleCustomInput('ans-place', this.value)">
+    </div>
+    <button onclick="nextScreen('screen-q5')" style="margin-top: 20px;">次へ ▶</button>
+  </div>
+
+  <!-- 🍴 画面6: QUESTION 05 (自由書き込み対応) -->
+  <div id="screen-q5" class="screen">
+    <h2>🍴 QUESTION 05</h2>
+    <h3>食べるなら何がいい？</h3>
+    <div class="option-grid">
+      <button class="option-btn" style="grid-column: span 2; background-color: #fff5f8; font-weight: bold; border-color: #ff69b4;" onclick="selectOption('ans-food', '🤝 一緒に考えたい！', this)">🤝 一緒に考えたい！</button>
+      <button class="option-btn" onclick="selectOption('ans-food', '🐡 魚', this)">🐡 魚</button>
+      <button class="option-btn" onclick="selectOption('ans-food', '🥩 肉', this)">🥩 肉</button>
+      <button class="option-btn" onclick="selectOption('ans-food', '🍝 パスタ', this)">🍝 パスタ</button>
+      <button class="option-btn" onclick="selectOption('ans-food', '🍜 ラーメン', this)">🍜 ラーメン</button><button class="option-btn" onclick="selectOption('ans-food', '🍚 ごはん', this)">🍚 ごはん</button><button class="option-btn" onclick="selectOption('ans-food', '🍰 甘いもの', this)">🍰 甘いもの</button>
+    </div>
+    <div style="margin-top: 15px; width: 100%; max-width: 320px;">
+      <p style="font-size: 0.85rem; color: #666; margin: 5px 0 0 0;">✍️ その他（食べたいものを入力）:</p>
+      <input type="text" id="custom-food" class="text-input" placeholder="例：サイゼ、日高屋など" oninput="handleCustomInput('ans-food', this.value)">
+    </div>
+    <button onclick="nextScreen('screen-confirm')" style="margin-top: 20px;">確認画面へ ▶</button>
+  </div>
+
+  <!-- 💌 画面7: 最終確認 -->
+  <div id="screen-confirm" class="screen">
+    <h2>💌 最終確認</h2>
+    <p>次会える日の確保🎁</p>
+    <div id="summary-box" style="background: white; padding: 20px; border-radius: 15px; text-align: left; max-width: 280px; width: 100%; margin: 10px 0; border: 2px solid #ffb6c1; font-size: 0.95rem;"></div>
+    <p>この内容で確定しますか？</p>
+    <button onclick="sendToLine()">💗 確定する</button>
+    <button onclick="nextScreen('screen-error')" style="background-color: #aaa; background: #aaa; box-shadow: none;">🤔 やっぱりやめる</button>
+  </div>
+
+  <!-- 🚨 画面8: ERROR -->
+  <div id="screen-error" class="screen">
+    <h1>🚨 ERROR</h1>
+    <div class="error-box">
+      <p style="font-weight: bold; margin: 0;">ERROR 404</p>
+      <p style="font-size: 0.9rem; margin: 5px 0;">DATE_NOT_FOUND</p>
+      <hr style="border-color: #ff4d4d;">
+      <p style="font-size: 0.95rem;">「デートしない」という選択肢は<br>システム上存在しません！🎂</p>
+      <p style="font-size: 0.85rem; color: #ff9999;">原因：彼女が許可していません。</p>
+    </div>
+    <button onclick="sendToLine()" style="background: #ff4d4d; font-size: 1.1rem; padding: 15px 30px;">
+      [ デートを確定してLINE送信 ]
+    </button>
+  </div>
+
+  <!-- 🎉 画面9: COMPLETE -->
+  <div id="screen-complete" class="screen">
+    <h1>🎉 HAPPY BIRTHDAY 🎉</h1>
+    <h2>デートプランが完了しました！</h2>
+    <p id="final-date-msg" style="font-size: 1.1rem; font-weight: bold; color: #ff1493;"></p>
+    <p style="font-size: 1.2rem; font-weight: bold; color: #ff69b4; margin-top: 15px;">たのしみ✨たのしみ✨</p>
+    <p style="font-size: 0.85rem; color: #666; margin-top: 20px;">※LINEであてねに送ってね！</p>
+  </div>
+
+  <script>
+    // 🔒 パスワード
+    const SECRET_PASSWORD = "0909";
+
+    // 〇（空いている日）の設定
+    const availableSepDays = [19, 20, 21, 22];
+    const availableOctDays = [5, 6, 7];
+
+    // 💔 NOボタンを押したときのメッセージ一覧
+    const noMsgs = [
+      'え、ほんとにNO？🥺',
+      'ちょっと待って！😭',
+      'まだまだ諦めない🔥',
+      'ねえお願い🙏🏻',
+      'YESおして〜！！',
+      '間違えてるよ！！！',
+      'NOはおさせないよ🙅🏻‍♀️',
+      '素直にYESにしよ？？',
+      'なんでなんで💦'
+    ];
+
+    const planData = {
+      'ans-date': [],
+      'ans-area': '未選択',
+      'ans-time': '朝から☀️',
+      'ans-place': '未選択',
+      'ans-food': '未選択'
+    };
+
+    let noCount = 0;
+
+    window.addEventListener('DOMContentLoaded', function() {
+      renderCalendars();
+    });
+
+    function handleKeyPress(e) {
+      if (e.key === 'Enter') {
+        checkPassword();
+      }
+    }
+
+    // 🔑 パスワード判定
+    function checkPassword() {
+      const inputEl = document.getElementById('pass-input');
+      const errorEl = document.getElementById('pass-error');
+      const inputVal = inputEl.value.trim();
+
+      if (inputVal === SECRET_PASSWORD) {
+        errorEl.innerText = "";
+        nextScreen('screen-video');
+        
+        const vid = document.getElementById('intro-video');
+        if (vid) {
+          const playPromise = vid.play();
+          if (playPromise !== undefined) {
+            playPromise.catch(error => {
+              console.log("動画自動再生制限");
+            });
+          }
+        }
+      } else {
+        errorEl.innerText = "合言葉が違います！もう一度試してね";
+      }
+    }
+
+    function endVideoAndNext() {
+      const vid = document.getElementById('intro-video');
+      if (vid) vid.pause();
+      nextScreen('screen-start');
+    }
+
+    // 📅 カレンダー生成
+    function renderCalendars() {
+      buildMonthGrid('calendar-days-sep', '9月', 2, 30, availableSepDays);
+      buildMonthGrid('calendar-days-oct', '10月', 4, 31, availableOctDays);
+    }
+
+    function buildMonthGrid(containerId, monthName, startDayOfWeek, maxDays, availableDays) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = '';
+
+      for (let i = 0; i < startDayOfWeek; i++) {
+        const emptyCell = document.createElement('div');
+        emptyCell.className = 'day-cell';
+        emptyCell.style.background = 'transparent';
+        emptyCell.style.border = 'none';
+        container.appendChild(emptyCell);
+      }
+
+      for (let d = 1; d <= maxDays; d++) {
+        const isAvailable = availableDays.includes(d);
+        const cell = document.createElement('div');
+        cell.className = `day-cell ${isAvailable ? 'available' : 'unavailable'}`;
+        
+        cell.innerHTML = `
+          <div>${d}</div>
+          <div class="status">${isAvailable ? '〇' : '×'}</div>
+        `;
+
+        if (isAvailable) {
+          const dateStr = `${monthName}${d}日`;
+          cell.onclick = function() {
+            if (planData['ans-date'].includes(dateStr)) {
+              planData['ans-date'] = planData['ans-date'].filter(item => item !== dateStr);
+              cell.classList.remove('selected');
+            } else {
+              planData['ans-date'].push(dateStr);
+              cell.classList.add('selected');
+            }
+
+            const displayEl = document.getElementById('selected-date-display');
+            if (planData['ans-date'].length > 0) {
+              displayEl.innerText = `選択中: ${planData['ans-date'].join('、')}`;
+            } else {
+              displayEl.innerText = '';
+            }
+          };
+        }
+
+        container.appendChild(cell);
+      }
+    }
+
+    function confirmDateAndNext() {
+      if (planData['ans-date'].length === 0) {
+        alert('〇がついている候補日を1つ以上選んでね！');
+        return;
+      }
+      nextScreen('screen-q2');
+    }
+
+    function escapeNo() {
+      const noBtn = document.getElementById('no-btn');
+      const msgEl = document.getElementById('no-msg');
+      msgEl.innerText = noMsgs[noCount % noMsgs.length];
+      noCount++;
+      const x = (Math.random() - 0.5) * 200;
+      const y = (Math.random() - 0.5) * 100;
+      noBtn.style.transform = `translate(${x}px, ${y}px)`;
+    }
+
+    function nextScreen(screenId) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(screenId).classList.add('active');
+
+      if (screenId === 'screen-confirm') {
+        const dateText = planData['ans-date'].length > 0 ? planData['ans-date'].join('、') : '未選択';
+        document.getElementById('summary-box').innerHTML = `
+          📅 <b>候補日:</b> ${dateText}<br>
+          🏯 <b>エリア:</b> ${planData['ans-area']}<br>
+          🕐 <b>時間:</b> ${planData['ans-time']}<br>
+          📍 <b>内容:</b> ${planData['ans-place']}<br>
+          🍴 <b>ご飯:</b> ${planData['ans-food']}
+        `;
+      }
+    }
+
+    function selectOption(key, value, btnElement) {
+      planData[key] = value;
+      const parent = btnElement.parentElement;
+      parent.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+      btnElement.classList.add('selected');
+
+      if (key === 'ans-place') document.getElementById('custom-place').value = '';
+      if (key === 'ans-food') document.getElementById('custom-food').value = '';
+    }
+
+    function handleCustomInput(key, textValue) {
+      if (textValue.trim() !== '') {
+        planData[key] = `✍️ ${textValue.trim()}`;
+        const containerId = key === 'ans-place' ? 'screen-q4' : 'screen-q5';
+        document.getElementById(containerId).querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+      }
+    }
+
+    function saveAndNext(inputId, nextScreenId) {
+      const val = document.getElementById(inputId).value;
+      if (val) planData[inputId] = val;
+      nextScreen(nextScreenId);
+    }
+
+    function sendToLine() {
+      const dateText = planData['ans-date'].length > 0 ? planData['ans-date'].join('、') : '次のデート';
+      document.getElementById('final-date-msg').innerText = `${dateText}、楽しみにしてるね♡`;
+
+      const message = `🎉 デートプラン送信！\n\n` +
+        `📅 候補日: ${dateText}\n` +
+        `🏯 エリア: ${planData['ans-area']}\n` +
+        `🕐 時間: ${planData['ans-time']}\n` +
+        `📍 内容: ${planData['ans-place']}\n` +
+        `🍴 ご飯: ${planData['ans-food']}\n\n` +
+        `すーぱーたのしみ✨\n` +
+        `（※LINEであてねに共有してね！）`;
+
+      const lineUrl = `https://line.me/R/share?text=${encodeURIComponent(message)}`;
+      
+      nextScreen('screen-complete');
+      setTimeout(() => {
+        window.location.href = lineUrl;
+      }, 1200);
+    }
+  </script>
+</body>
+</html>
